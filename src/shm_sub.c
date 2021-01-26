@@ -1804,6 +1804,8 @@ sr_shmsub_notif_notify(const struct lyd_node *notif, time_t notif_ts, sr_sid_t s
     multi_sub_shm = (sr_multi_sub_shm_t *)shm_sub.addr;
 
     /* write the notification, we do not wait for any reply */
+    sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACE: write the notification: %s.", ly_mod->name);
+
     request_id = multi_sub_shm->request_id + 1;
     sr_shmsub_multi_notify_write_event(multi_sub_shm, request_id, 0, SR_SUB_EV_NOTIF, &sid, notif_sub_count,
             notif_ts, notif_lyb, notif_lyb_len, ly_mod->name);

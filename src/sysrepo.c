@@ -4403,27 +4403,35 @@ _sr_event_notif_subscribe(sr_session_ctx_t *session, const char *mod_name, const
 
     if (!start_time) {
         /* add notification subscription into main SHM now if replay was not requested */
+ 	sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Add notification SHMMOD xPath \"%s\" .", xpath);
         if ((err_info = sr_shmmod_notif_subscription_add(&conn->ext_shm, shm_mod, (*subscription)->evpipe_num))) {
+            sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Notification SHMMOD not added");
             goto error_unlock_unsub;
         }
     }
 
     /* add subscription into structure and create separate specific SHM segment */
+    sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Add notification SUB NOTIF xPath \"%s\" .", xpath);
     if ((err_info = sr_sub_notif_add(session, ly_mod->name, xpath, start_time, stop_time, callback, tree_callback,
                 private_data, *subscription))) {
+	sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Notification SUB NOTIF not added");
         goto error_unlock_unsub_unmod;
     }
 
     if (start_time) {
+	sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Add notification SHMSUB NOTIF xPath \"%s\" .", xpath);
         /* notify subscription there are already some events (replay needs to be performed) */
         if ((err_info = sr_shmsub_notify_evpipe((*subscription)->evpipe_num))) {
+	    sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Notification SHMSUB NOTIF not added");
             goto error_unlock_unsub;
         }
     }
 
     /* add the subscription into session */
+    sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Add notification to session xPath \"%s\" .", xpath);
     if ((err_info = sr_ptr_add(&session->ptr_lock, (void ***)&session->subscriptions, &session->subscription_count,
                 *subscription))) {
+	sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Notification not added to session");
         goto error_unlock_unsub_unmod;
     }
 
@@ -4605,6 +4613,7 @@ sr_event_notif_send_tree(sr_session_ctx_t *session, struct lyd_node *notif)
     }
 
     if (notif_sub_count) {
+	sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "Number of subscribers found:  %d.", notif_sub_count);
         /* publish notif in an event, do not wait for subscribers */
         if ((tmp_err_info = sr_shmsub_notif_notify(notif, notif_ts, session->sid, (uint32_t *)notif_subs, notif_sub_count))) {
             goto cleanup_shm_unlock;
