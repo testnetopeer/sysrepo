@@ -2941,6 +2941,8 @@ sr_shmsub_notif_listen_process_module_events(struct modsub_notif_s *notif_subs, 
     sr_multi_sub_shm_t *multi_sub_shm;
     sr_sid_t sid;
 
+    SR_LOG_INF("TRACING: Enter  sr_shmsub_notif_listen_process_module_events !!!", 0);
+
     multi_sub_shm = (sr_multi_sub_shm_t *)notif_subs->sub_shm.addr;
 
     /* SUB READ LOCK */
@@ -3013,6 +3015,13 @@ sr_shmsub_notif_listen_process_module_events(struct modsub_notif_s *notif_subs, 
             }
             ly_set_free(set);
         }
+
+	SR_LOG_INF("TRACING: Sending CALLBACK !!!", 0);
+        SR_LOG_INF("TRACING: Module name \"%s\" .", notif_subs->module_name);
+        SR_LOG_INF("TRACING: Event with ID %u.", multi_sub_shm->request_id);
+        SR_LOG_INF("TRACING: XPATH \"%s\" .", notif_subs->subs[i].xpath);
+        SR_LOG_INF("TRACING: Sysrepo session ID \"%d\" .", notif_subs->subs[i].sess->sid.sr);
+        SR_LOG_INF("TRACING: Netconf session ID \"%d\" .", notif_subs->subs[i].sess->sid.nc);
 
         if ((err_info = sr_notif_call_callback(conn, notif_subs->subs[i].cb, notif_subs->subs[i].tree_cb,
                 notif_subs->subs[i].private_data, SR_EV_NOTIF_REALTIME, notif_op, notif_ts, sid))) {
@@ -3202,14 +3211,19 @@ sr_shmsub_listen_thread(void *arg)
     time_t stop_time_in = 0;
     int ret;
 
+
+    SR_LOG_INF("TRACING: Enter  sr_shmsub_listen_thread !!!", 0);
+
     /* start event loop */
     goto wait_for_event;
 
     while (ATOMIC_LOAD_RELAXED(subs->thread_running)) {
         /* process the new event (or subscription stop time has elapsed) */
+	SR_LOG_INF("TRACING: Process the new event !!!", 0);
         ret = sr_process_events(subs, NULL, &stop_time_in);
         if ((ret != SR_ERR_OK) && (ret != SR_ERR_TIME_OUT)) {
             /* continue on time out */
+            SR_LOG_INF("TRACING: Event processing failed !!!", 0);
             goto error;
         }
 
