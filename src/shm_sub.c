@@ -2941,6 +2941,14 @@ sr_shmsub_notif_listen_process_module_events(struct modsub_notif_s *notif_subs, 
     sr_multi_sub_shm_t *multi_sub_shm;
     sr_sid_t sid;
 
+    struct ly_set *set1;
+    char* path;
+    char* delim;
+    char *istr;
+    size_t start_pos;
+    char* substr;
+    int length_of_new_str;
+
     SR_LOG_INF("TRACING: Enter  sr_shmsub_notif_listen_process_module_events !!!", 0);
 
     multi_sub_shm = (sr_multi_sub_shm_t *)notif_subs->sub_shm.addr;
@@ -3012,6 +3020,57 @@ sr_shmsub_notif_listen_process_module_events(struct modsub_notif_s *notif_subs, 
             SR_CHECK_INT_GOTO(!set, err_info, cleanup);
             if (!set->number) {
                 ly_set_free(set);
+
+
+		SR_LOG_INF("TRACING: SUBS XPATH not found initially", 0);
+
+                path = notif_subs->subs[i].xpath;
+                delim = " and ";
+                start_pos = 0;
+
+                while (start_pos <= strlen(path))
+                {
+                    istr = strstr (path+start_pos,delim);
+
+                    if (istr == NULL)
+                    {
+                        SR_LOG_INF("TRACING: subs not found", 0);
+                        continue;
+                    }
+                    else
+                    {
+                        length_of_new_str = istr-path-start_pos;
+                        substr = malloc(length_of_new_str+1);
+                        strncpy(substr, path+start_pos, length_of_new_str);
+                        substr[length_of_new_str] = '\0';
+
+                        SR_LOG_INF("TRACING: subs found = %s\n",substr);
+                        start_pos = istr - path + strlen(delim);
+
+                        set1 = lyd_find_path(notif_op, substr);
+
+                        free(substr);
+
+                        if (set1->number)
+			{
+                            SR_LOG_INF("TRACING: matching!!!", 0);
+
+                            if ((err_info = sr_notif_call_callback(conn, notif_subs->subs[i].cb, notif_subs->subs[i].tree_cb,
+                                    notif_subs->subs[i].private_data, SR_EV_NOTIF_REALTIME, notif_op, notif_ts, sid))) {
+                            }
+                            ly_set_free(set1);
+                            goto cleanup;
+                        }
+                        else
+                        {
+                            SR_LOG_INF("TRACING: not matching", 0);
+                            ly_set_free(set1);
+                        }
+                    }
+
+                }
+
+
                 continue;
             }
             ly_set_free(set);
