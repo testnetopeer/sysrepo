@@ -3035,7 +3035,7 @@ sr_shmsub_notif_listen_process_module_events(struct modsub_notif_s *notif_subs, 
                     if (istr == NULL)
                     {
                         SR_LOG_INF("TRACING: subs not found", 0);
-                        continue;
+                        break;
                     }
                     else
                     {
