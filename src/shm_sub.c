@@ -3008,6 +3008,7 @@ sr_shmsub_notif_listen_process_module_events(struct modsub_notif_s *notif_subs, 
     for (i = 0; i < notif_subs->sub_count; ++i) {
         if (notif_subs->subs[i].xpath) {
             set = lyd_find_path(notif_op, notif_subs->subs[i].xpath);
+	    SR_LOG_INF("TRACING: SUBS XPATH \"%s\" .", notif_subs->subs[i].xpath);
             SR_CHECK_INT_GOTO(!set, err_info, cleanup);
             if (!set->number) {
                 ly_set_free(set);
