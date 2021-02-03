@@ -3059,7 +3059,7 @@ sr_shmsub_notif_listen_process_module_events(struct modsub_notif_s *notif_subs, 
                                     notif_subs->subs[i].private_data, SR_EV_NOTIF_REALTIME, notif_op, notif_ts, sid))) {
                             }
                             ly_set_free(set1);
-                            goto cleanup;
+                            break;
                         }
                         else
                         {
