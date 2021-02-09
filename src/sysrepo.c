@@ -4438,6 +4438,8 @@ _sr_event_notif_subscribe(sr_session_ctx_t *session, const char *mod_name, const
     /* SHM UNLOCK */
     sr_shmmain_unlock(conn, SR_LOCK_WRITE, 1, __func__);
 
+    
+	sr_errinfo_new(&err_info, SR_ERR_NOT_FOUND, NULL, "TRACING Notification added to session");
     return sr_api_ret(session, NULL);
 
 error_unlock_unsub_unmod:
