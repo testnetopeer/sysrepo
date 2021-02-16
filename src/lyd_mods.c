@@ -917,7 +917,7 @@ sr_lydmods_create(struct ly_ctx *ly_ctx, struct lyd_node **sr_mods_p)
     }
 
     /* install ietf-datastores and ietf-yang-library */
-    SR_INSTALL_INT_MOD(ietf_datastores_yang, 1);
+//    SR_INSTALL_INT_MOD(ietf_datastores_yang, 1);
     SR_INSTALL_INT_MOD(ietf_yang_library_yang, 0);
 
     /* install sysrepo-monitoring */
